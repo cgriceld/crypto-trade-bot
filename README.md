@@ -290,7 +290,7 @@ text/plain Internal Server Error, Status 500 (Internal Server Error)
 
 # queries
 
-Во всех запросах, где передаются query-параметры, в случае ошибки обработки параметров возможны следующие response (text/plain).
+In all requests with query parameters the following responses may take place (text/plain):
 
 * `Wrong query parameter: no [market/price/size]`, Status 400 (Bad Request)\
   No parameter
