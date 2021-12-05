@@ -2,7 +2,7 @@ Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/fu
 
 Project tech-features:
 * Clean architecture design pattern
-* Stack: go-chi, Gorilla WebSocket, Postgres
+* Stack: go-chi, Gorilla WebSocket, Postgres (pgx), logrus
 * Unit-tests coverage
 
 # Contents
@@ -29,10 +29,10 @@ Project tech-features:
 Parameters must be set as environmental variables (you can use `source setenv.sh` for convenience).
 
 <pre>
-APIPubli    - public API-key from Kraken demo-platform
+APIPublic   - public API-key from Kraken demo-platform
 API Private - private API-key from Kraken demo-platform
 TgChatID    - Telegram bot chat ID
-TgBotURL    - URL to the endpoint /SendMessage of Telegram containing the bot token
+TgBotURL    - https://api.telegram.org/bot[token]/sendMessage
 port        - port on which the robot server will run
 dsn         - string for connecting to Postgres
 </pre>
