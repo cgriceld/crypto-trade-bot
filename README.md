@@ -1,79 +1,80 @@
+Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/futures/PI_XBTUSD). 
+
+# Contents
+
+1. [Robot features](#robot)
+2. [Setup](#setup)
+3. [Telegram bot notifications](#notifications)
+4. [Endpoints documentation](#endpoints)
+
+# robot
+
+* The robot uses stop-loss/take-profit strategy. User can configure robot by setting market, price and size. After robot is successfully started, it listens on 1-minute candles (via websocket subscription), compares the average candle price with user settings and sends ioc order on Kraken if the price is triggered.
+* The robot can be launched on several markets in parallel.
+* For conditions of robot start see /start or /startall endpoint.
+* Afer user configured inner robot order (/setsell or /setbuy) this order becomes active. If this order is trigged (sended to Kraken) or explicitly cancelled by the user (/unset...), it becomes inactive. 
+* User can set a new order (e.g. set buy order if it was not set at startup), change the price and size in an already active one or cancel the order **when the robot is already running on market** (no need to stop the robot especially for that).
+* The robot sends notifications to Telegram bot (see [notifications](#notifications)).
+* Information about executed orders is stored in Postgres.
+
 # setup
 
-Перед началом работы необходимо задать ряд параметров через переменные окружения, для этого можно воспользоваться файлом `setenv.sh` (в корне).
-Параметры:
-* APIPublic - публичный ключ API от Kraken
-* APIPrivate - приватный ключ API от Kraken
-* TgChatID - ID чата Telegram-бота
-* TgBotURL - URL на endpoint /sendMessage у Telegram, содержащий токен бота
-* port - порт, на котором будет запущен сервер
-* dsn - строка для подключения к Postgres
+Parameters must be set as environmental variables (you can use `source setenv.sh` for convenience).
 
-Postgres запускается через `docker-compose.yaml` (в корне).
+* APIPublic   - public API-key from Kraken demo-platform
+* API Private - private API-key from Kraken demo-platform
+* TgChatID    - Telegram bot chat ID
+* TgBotURL    - URL to the endpoint /SendMessage of Telegram containing the bot token
+* port        - the port on which the robot server will run
+* dsn         - string for connecting to Postgres
 
-В корне репозитория также есть `Makefile`:
-* `make` - запускает сервер
-* `make test` - запускает тесты с coverage
-* `make startdb` - поднимает базу
-* `make stopdb` - останавливает базу
+Use `docker-compose.yaml` to start Postgres.
 
-#  robot
-
-* Робот реализует стратегию stop-loss/take-profit. Пользователь выбирает рынок, цену, при которой он бы хотел продать или купить, и размер (сколько продать/купить). Робот слушает одноминутные свечи, вычисляет среднюю цену по свече, сравнивает ее с установленными пользователем значениями и отправляет ордер на Kraken, если триггер срабатывает.
-
-* Робот может быть одновременно запущен на нескольких рынках.
-
-* Для запуска робота на рынке необходимо, чтобы рынок был задан ранее (/setmarket), на нем был задан хотя бы один ордер (/setsell, /sellbuy), на нем уже не был запущен робот (подробнее см. endpoints /start или /startall).
-
-* После настройки ордера (/setsell или /setbuy) ордер становится активным. Когда он срабатывает (отправляется на Kraken) или отменяется самим пользователем (/unsetsell, /unsetbuy, /unsetall), он становится неактивным. Задать новый ордер, поменять цену и размер в уже активном, отменить ордер **можно при запущенном роботе** (для этого не надо его специально останаливать).
-
-Например, для запуска робота на рынке pi_ethusd необходимо выполнить следующие действия:
-1. /setmarket?market=pi_ethusd
-2. /setsell?size=5&market=pi_ethusd&price=4000
-3. /start?market=pi_ethusd или /startall
-4. Profit!
+Basic `Makefile` rules:
+* `make`      - start robot server
+* `make test` - run tests with coverage
 
 # notifications
 
-Пользователю отправляется несколько видом уведомлений.
-
 `✅ Start subscription on market: pi_ethusd`
 
-Робот запустился на рынке.
+The robot is successfuly started on market.
 
 ---
 
 `⚠️ Stop subscription on market: pi_ethusd`
 
-Робот на рынке остановлен.
-Это может быть причине:
-1. Явной остановки (/stop, /stopall)
-2. Произошла ошибка веб-сокета и переподключиться не получилось
-3. Сервер остановлен (sigint)
+The robot on market is stopped.
+
+Reasons:
+1. It was explicitly stopped by user (/stop, /stopall).
+2. Websocket error (code 1006) and reconnection doesn't help.
+3. Server is stopped (graceful shutdown).
 
 ---
 
 `📌 Make buy order on pi_xbtusd. Price: 58620.50`
 
-Ордер успешно исполнен.
+Order was successfuly placed and executed.
 
 ---
 
 `❌ Fail to place order: pi_ethusd: sell: server error`
 
-Не удалось отправить ордер на Kraken по причине внутренней ошибки.
+Fail to send order to Kraken due to inner error.
 
 ---
 
 `❌ Fail to execute order: pi_xbtusd: sell: insufficient funds`
 
-Kraken не может исполнить ордер, так как на балансе недостаточно средств.
+Order was rejected because of balance error.
+
 
 ---
 
 `❌ Fail to execute order: pi_xbtusd: sell`
 
-Kraken не может исполнить ордер по любой другой причине, отличной от недостаточного баланса.
+Order was rejected because of every another reason except balance error.
 
 #  endpoints
 
