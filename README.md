@@ -1,8 +1,13 @@
-Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/futures/PI_XBTUSD). 
+Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/futures/PI_XBTUSD).
+
+Project tech-features:
+* Clean architecture design pattern
+* Stack: go-chi, Gorilla WebSocket, Postgres
+* Unit-tests coverage
 
 # Contents
 
-1. [Robot features](#robot)
+1. [Robot overview](#robot)
 2. [Setup](#setup)
 3. [Telegram bot notifications](#notifications)
 4. [Endpoints documentation](#endpoints)
@@ -11,9 +16,11 @@ Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/fu
 
 * The robot uses stop-loss/take-profit strategy. User can configure robot by setting market, price and size. After robot is successfully started, it listens on 1-minute candles (via websocket subscription), compares the average candle price with user settings and sends ioc order on Kraken if the price is triggered.
 * The robot can be launched on several markets in parallel.
+
 * For conditions of robot start see /start or /startall endpoint.
 * Afer user configured inner robot order (/setsell or /setbuy) this order becomes active. If this order is trigged (sended to Kraken) or explicitly cancelled by the user (/unset...), it becomes inactive. 
 * User can set a new order (e.g. set buy order if it was not set at startup), change the price and size in an already active one or cancel the order **when the robot is already running on market** (no need to stop the robot especially for that).
+
 * The robot sends notifications to Telegram bot (see [notifications](#notifications)).
 * Information about executed orders is stored in Postgres.
 
@@ -21,16 +28,18 @@ Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/fu
 
 Parameters must be set as environmental variables (you can use `source setenv.sh` for convenience).
 
-* APIPublic   - public API-key from Kraken demo-platform
-* API Private - private API-key from Kraken demo-platform
-* TgChatID    - Telegram bot chat ID
-* TgBotURL    - URL to the endpoint /SendMessage of Telegram containing the bot token
-* port        - the port on which the robot server will run
-* dsn         - string for connecting to Postgres
+<pre>
+APIPubli    - public API-key from Kraken demo-platform
+API Private - private API-key from Kraken demo-platform
+TgChatID    - Telegram bot chat ID
+TgBotURL    - URL to the endpoint /SendMessage of Telegram containing the bot token
+port        - port on which the robot server will run
+dsn         - string for connecting to Postgres
+</pre>
 
 Use `docker-compose.yaml` to start Postgres.
 
-Basic `Makefile` rules:
+Some `Makefile` rules:
 * `make`      - start robot server
 * `make test` - run tests with coverage
 
@@ -81,7 +90,7 @@ Order was rejected because of every another reason except balance error.
 ```http
 POST /setmarket?market=`market`
 ```
-Задает новый рынок[*](#queries).
+Sets new market[*](#queries).
 
 ```go
 Sample Response on Success:
@@ -93,7 +102,7 @@ JSON {"market":"pi_xbtusd", "status":"ok"}, Status 201 (Created)
 ```http
 POST /setsell?market=`market`&price=`price`&size=`size`
 ```
-Устанавливает ордер на продажу с переданными параметрами. Если ранее на данном рынке не устанавливалось никаких ордеров, то необходимо сначала установить этот рынок (/setmarket)[*](#queries).
+Sets inner sell order with passed query parameters. If no orders have been placed on this market before, then you must first set this market (/setmarket)[*](#queries).
 
 ```go
 Sample Response on Success:
@@ -107,7 +116,7 @@ JSON {"market":"pi_ethusd", "status":"No market was set: pi_ethusd"}, Status 400
 ```http
 POST /setbuy?market=`market`&price=`price`&size=`size`
 ```
-Устанавливает ордер на покупку с переданными параметрами. Если ранее на данном рынке не устанавливалось никаких ордеров, то необходимо сначала установить этот рынок (/setmarket)[*](#queries).
+Sets inner buy order with passed query parameters. If no orders have been placed on this market before, then you must first set this market (/setmarket)[*](#queries).
 
 ```go
 Sample Response on Success:
@@ -122,7 +131,7 @@ JSON {"market":"pi_ethusd", "status":"No market was set: pi_ethusd"}, Status 400
 ```http
 POST /unsetsell?market=`market`
 ```
-Отменяет ордер на продажу на данном рынке[*](#queries).
+Unsets inner sell order on market passed as parameter[*](#queries).
 
 ```go
 Sample Response on Success:
@@ -137,7 +146,7 @@ JSON {"market":"pi_ethusd", "status":"No market was set: pi_ethusd"}, Status 400
 ```http
 POST /unsetbuy?market=`market`
 ```
-Отменяет ордер на покупку на данном рынке[*](#queries).
+Unsets inner buy order on market passed as parameter[*](#queries).
 
 ```go
 Sample Response on Success:
@@ -152,7 +161,7 @@ JSON {"market":"pi_ethusd", "status":"No market was set: pi_ethusd"}, Status 400
 ```http
 POST /unsetall
 ```
-Отменяет все ордеры на всех рынках.
+Unsets all orders on all previously set markets.
 
 ```go
 JSON [{"market":"pi_xbtusd", "status":"ok"}, {"market":"pi_ethusd", "status":"ok"}], Status 200 (OK)
@@ -163,7 +172,7 @@ JSON [{"market":"pi_xbtusd", "status":"ok"}, {"market":"pi_ethusd", "status":"ok
 ```http
 POST /start?market=`market`
 ```
-Запускает робота на данном рынке. Для запуска необходимо, чтобы рынок был задан ранее (/setmarket), на нем был задан хотя бы один ордер (на покупку или продажу), на нем уже не был запущен робот[*](#queries).
+Launches the robot on market passed as parameter. The market must be set before (/setmarket), there must be at least one active order on that market and the robot must not be already running on that market[*](#queries).
 
 ```go
 Sample Response on Success:
@@ -181,8 +190,7 @@ JSON {"market":"pi_ethusd", "status":"Internal Server Error"}, Status 500 (Inter
 ```http
 POST /startall
 ```
-Запускает робота на всех рынках. Критерии запуска такие же, как и при /start. По статусу в теле ответа можно понять, какие рынки были запущены, а какие - нет и почему.
-
+Launches the robot on all previously set markets. The launch criteria are the same as for /start. By the status field in the body of the response, you can understand which markets were launched and which were not and why.
 ```go
 JSON [{"market":"pi_xbtusd", "status":"ok"}, {"market":"pi_ethusd", "status":"Fail to start, parameter wasn't set: pi_ethusd: orders"}], Status 200 (OK)
 ```
@@ -192,7 +200,7 @@ JSON [{"market":"pi_xbtusd", "status":"ok"}, {"market":"pi_ethusd", "status":"Fa
 ```http
 POST /stop?market=`market`
 ```
-Останавливает робота на данном рынке[*](#queries).
+Stops the robot on market passed as parameter[*](#queries).
 
 ```go
 Sample Response on Success:
@@ -207,7 +215,7 @@ JSON {"market":"pi_ethusd", "status":"No market was set: pi_ethusd"}, Status 400
 ```http
 POST /stopall
 ```
-Останавливает робота на всех рынках.
+Stops the robot on all previously set markets.
 
 ```go
 JSON [{"market":"pi_xbtusd", "status":"ok"}, {"market":"pi_ethusd", "status":"ok"}], Status 200 (OK)
@@ -218,7 +226,7 @@ JSON [{"market":"pi_xbtusd", "status":"ok"}, {"market":"pi_ethusd", "status":"ok
 ```http
 GET /active?market=`market`
 ```
-Возвращает активные на данный момент ордеры на данном рынке[*](#queries).
+Returns currently active orders on market passed as parameter[*](#queries).
 
 ```go
 Sample Response on Success:
@@ -233,7 +241,7 @@ JSON {"market":"pi_ethusd", "status":"No market was set: pi_ethusd"}, Status 400
 ```http
 GET /activeall
 ```
-Возвращает активные на данный момент ордеры на всех рынках.
+Returns all currently active orders on all previously set markets.
 
 ```go
 JSON [{"market":"pi_xbtusd", "type":"buy", "price":4000, "size":1}, {"market":"pi_ethusd", "type":"buy", "price":4000, "size":1}], Status 200 (OK)
@@ -244,7 +252,7 @@ JSON [{"market":"pi_xbtusd", "type":"buy", "price":4000, "size":1}, {"market":"p
 ```http
 GET /running
 ```
-Возвращает, на каких рынках в данный момент запущен робот.
+Returns markets where the robot is currently running.
 
 ```go
 JSON [{"market":"pi_xbtusd", "status":"running"}, {"market":"pi_ethusd", "running"}], Status 200 (OK)
@@ -255,7 +263,7 @@ JSON [{"market":"pi_xbtusd", "status":"running"}, {"market":"pi_ethusd", "runnin
 ```http
 GET /orders
 ```
-Возвращает выставленные и исполненные ордеры.
+Returns executed orders from the database.
 
 ```go
 Sample Response on Success:
@@ -270,7 +278,7 @@ text/plain Internal Server Error, Status 500 (Internal Server Error)
 ```http
 GET /accounts
 ```
-Возвращает информацию о балансе пользователя.
+Returns user balance info.
 
 ```go
 Sample Response on Success:
@@ -285,8 +293,8 @@ text/plain Internal Server Error, Status 500 (Internal Server Error)
 Во всех запросах, где передаются query-параметры, в случае ошибки обработки параметров возможны следующие response (text/plain).
 
 * `Wrong query parameter: no [market/price/size]`, Status 400 (Bad Request)\
-  Отсутствует параметр
+  No parameter
 * `Wrong query parameter: [price/size]: [value]`, Status 400 (Bad Request)\
-  Недопустимое значение параметра (отрицательное число, 0)
+  Invalid parameter value (e.g. negative price)
 * `Internal Server Error`, Status 500 (Internal Server Error)\
-  Внутренняя ошибка при обработке параметров
+  Internal error from the middleware during processing
