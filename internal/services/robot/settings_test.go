@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"tff-go/trade_bot/internal/domain"
+	"github.com/cgriceld/crypto-trade-bot/internal/domain"
 
 	"github.com/stretchr/testify/assert"
 )

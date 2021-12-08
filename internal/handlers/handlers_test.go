@@ -8,10 +8,10 @@ import (
 	"os"
 	"testing"
 
-	"tff-go/trade_bot/internal/domain"
-	"tff-go/trade_bot/internal/services/robot"
-	"tff-go/trade_bot/pkg/kraken"
-	"tff-go/trade_bot/pkg/log"
+	"github.com/cgriceld/crypto-trade-bot/internal/domain"
+	"github.com/cgriceld/crypto-trade-bot/internal/services/robot"
+	"github.com/cgriceld/crypto-trade-bot/pkg/kraken"
+	"github.com/cgriceld/crypto-trade-bot/pkg/log"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"

@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"tff-go/trade_bot/internal/domain"
+	"github.com/cgriceld/crypto-trade-bot/internal/domain"
 )
 
 func (r *Robot) avgPrice(candle domain.CandleSub) (float64, error) {

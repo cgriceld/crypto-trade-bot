@@ -3,7 +3,7 @@ package queries
 import (
 	"context"
 
-	"tff-go/trade_bot/internal/domain"
+	"github.com/cgriceld/crypto-trade-bot/internal/domain"
 )
 
 const saveOrder = `INSERT INTO orders(ts, market, type, price, size) VALUES ($1, $2, $3, $4, $5)`

@@ -9,13 +9,13 @@ import (
 	"syscall"
 	"time"
 
-	"tff-go/trade_bot/internal/handlers"
-	"tff-go/trade_bot/internal/repository"
-	"tff-go/trade_bot/internal/services/robot"
-	"tff-go/trade_bot/pkg/kraken"
-	"tff-go/trade_bot/pkg/log"
-	pgs "tff-go/trade_bot/pkg/postgres"
-	"tff-go/trade_bot/pkg/telegram"
+	"github.com/cgriceld/crypto-trade-bot/internal/handlers"
+	"github.com/cgriceld/crypto-trade-bot/internal/repository"
+	"github.com/cgriceld/crypto-trade-bot/internal/services/robot"
+	"github.com/cgriceld/crypto-trade-bot/pkg/kraken"
+	"github.com/cgriceld/crypto-trade-bot/pkg/log"
+	pgs "github.com/cgriceld/crypto-trade-bot/pkg/postgres"
+	"github.com/cgriceld/crypto-trade-bot/pkg/telegram"
 
 	"github.com/sirupsen/logrus"
 )

@@ -1,9 +1,9 @@
 package kraken
 
 import (
-	"tff-go/trade_bot/internal/domain"
+	"github.com/cgriceld/crypto-trade-bot/internal/domain"
 
-	"tff-go/trade_bot/pkg/log"
+	"github.com/cgriceld/crypto-trade-bot/pkg/log"
 )
 
 type TgMock interface {

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"tff-go/trade_bot/internal/domain"
+	"github.com/cgriceld/crypto-trade-bot/internal/domain"
 )
 
 const (
