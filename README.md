@@ -2,15 +2,19 @@ Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/fu
 
 Project tech-features:
 * Clean architecture design pattern
-* Stack: go-chi, Gorilla WebSocket, Postgres (pgx), logrus
+* go-chi, Gorilla WebSocket, Postgres (pgx), logrus
 * Unit-tests coverage
 
-# Contents
+❗️ Robot works with API of **demo** version of platform\
+❗️ Trading logic of the robot does not guarantee profitability
 
-1. [Robot overview](#robot)
+# contents
+
+1. [Robot Overview](#robot)
 2. [Setup](#setup)
-3. [Telegram bot notifications](#notifications)
-4. [Endpoints documentation](#endpoints)
+3. [Telegram Bot Notifications](#notifications)
+4. [Endpoints Documentation](#endpoints)
+5. [Launch Example](#launch)
 
 # robot
 
@@ -77,7 +81,6 @@ Fail to send order to Kraken due to inner error.
 `❌ Fail to execute order: pi_xbtusd: sell: insufficient funds`
 
 Order was rejected because of balance error.
-
 
 ---
 
@@ -298,3 +301,12 @@ In all requests with query parameters the following responses may take place (te
   Invalid parameter value (e.g. negative price)
 * `Internal Server Error`, Status 500 (Internal Server Error)\
   Internal error from the middleware during processing
+  
+# launch
+
+For example, to start robot on pi_ethusd market you should:
+
+1. /setmarket?market=pi_ethusd
+2. /setsell?size=5&market=pi_ethusd&price=4000
+3. /start?market=pi_ethusd or /startall
+4. Profit!
