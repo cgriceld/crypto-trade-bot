@@ -1,3 +1,5 @@
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/cgriceld/crypto-trading-bot?logo=Go&style=plastic)
+
 Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/futures/PI_XBTUSD).
 
 Project tech-features:
