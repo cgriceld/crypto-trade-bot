@@ -5,6 +5,8 @@ Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/fu
 Project tech-features:
 * Clean architecture design pattern
 * go-chi, Gorilla WebSocket, Postgres (pgx), logrus
+* Integration with Telegram Bot
+* REST API and Websocket API on Kraken Futures (demo) support
 * Unit-tests coverage
 
 ❗️ Robot works with API of **demo** version of platform\
