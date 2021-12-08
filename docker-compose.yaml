@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: passwd
-      POSTGRES_DB: fintech
+      POSTGRES_DB: robot
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
