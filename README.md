@@ -3,7 +3,8 @@
 Trade robot on Kraken Futures [demo-platform](https://demo-futures.kraken.com/futures/PI_XBTUSD).
 
 Project tech-features:
-* Clean architecture design pattern
+* Clean Architecture design pattern
+* Graceful Shutdown
 * go-chi, Gorilla WebSocket, Postgres (pgx), logrus
 * Integration with Telegram Bot
 * REST API and Websocket API on Kraken Futures (demo) support
